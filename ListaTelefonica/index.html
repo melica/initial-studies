@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html ng-app="listaTelefonica">
+<head>
+	<meta charset="UTF-8">
+	<title>Lista Telefonica</title>
+	<script src="lib/angular/angular.js"></script>
+	<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.css">
+	<style>
+		.jumbotron{
+			width: 400px;
+			text-align: center;
+			margin-top: 20px;
+			margin-right: auto;
+			margin-left: auto;
+		}
+		.table{
+			margin-top:20px;
+		}
+		.form-control{
+			margin-bottom: 5px;
+		}
+		.selecionado{
+			background-color: yellow;
+		}
+		.negrito{
+			font-weight: bold;
+		}
+	</style>
+
+	<script>
+	angular.module("listaTelefonica", []);
+	angular.module("listaTelefonica").controller("listaTelefonicaController", function($scope){
+		$scope.app="Lista Telefonica";
+		$scope.contatos= [
+			{nome: "Joao", telefone: "99999999", cor: "blue"},
+			{nome: "Maria", telefone: "88888888", cor:"yellow"},
+			{nome: "Jose", telefone: "77777777", cor:"red"}
+		];
+		/*$scope.adicionarContato = function(nome, telefone){
+			//$scope.contatos.push({nome: $scope.nome, telefone: $scope.telefone}); - Evitar ao máximo ler o scope dentro do controller
+			$scope.contatos.push({nome:nome, telefone:telefone}); - de uma maneira mais explicita
+
+			Quando estiver definindo uma entidade estou definindo uma abstração contato.nome, contato.telefone na view
+
+		};*/
+		$scope.operadoras = [
+			{nome: "Oi" , codigo: 14, categoria: "celular"},
+			{nome: "Vivo" , codigo: 15, categoria: "celular"},
+			{nome: "Tim" , codigo: 41, categoria: "celular"},
+			{nome: "GVT" , codigo: 25, categoria: "fixo"},
+			{nome: "Embratel" , codigo: 21, categoria: "fixo"}
+		];
+		$scope.adicionarContato = function(contato){
+			$scope.contatos.push(angular.copy(contato));
+			delete $scope.contato;
+			//para quebrar o ciclo, e o contato não ser alterado durante a digitação
+			$scope.contatoForm.$setPristine();
+		};
+		$scope.apagarContatos = function(contatos){
+			$scope.contatos = contatos.filter(function(contato) {
+				if (!contato.selecionado) {
+					return contato;
+				};
+			});
+		}
+		$scope.isContatoSelecionado = function(contatos){
+			return contatos.some(function(contato){
+				return contato.selecionado;
+			});
+		}
+	});
+	</script>
+</head>
+<body ng-controller="listaTelefonicaController">
+<div class="jumbotron">
+	<h3>{{app}} </h3>
+	<table  ng-show="contatos.length > 0" class="table table-striped">
+		<tr>
+			<th></th>
+			<th>Nome</th>
+			<th>Telefone</th>
+			<th>Operadora</th>
+		</tr>
+		
+		<tr ng-class="{selecionado: contato.selecionado, negrito: contato.selecionado}" ng-repeat= "contato in contatos">
+		<!--<tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat= "contato in contatos">
+		No JS um objeto pode ter um identificador que é uma string
+		-->
+		<!-- {selecionado: contato.selecionado} o ng-class só é acionado quando o contato.selecionado for true-->
+
+			<td><input type="checkbox" ng-model="contato.selecionado"/></td>
+			<td>{{contato.nome}} </td>
+			<td>{{contato.telefone}} </td>
+			<td>{{contato.operadora.nome}} </td>
+			<td><div style="width: 20px; height: 20px;" ng-style="{'background-color': contato.cor}"></div></td>
+			<!---<td ng-repeat="(key,value) in contato">
+				{{value}}
+			</td>-->
+		</tr>
+	</table>
+	<form name="contatoForm">
+	<input class="form-control" type="text" placeholder="nome" ng-model="contato.nome" name="nome" ng-required="true" ng-minlength="10"/>
+	<input class="form-control" type="text" placeholder="telefone" ng-model="contato.telefone" name="telefone" ng-required="true"/>
+	
+	<!--<select class="form-control" ng-model="contato.operadora" ng-options="operadora.codigo as operadora.nome for operadora in operadoras"> 
+	Outra opção para ng-options que insere apenas um valor em contato e não o objeto todo-->
+	
+	<!--<select class="form-control" ng-model="contato.operadora" ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
+	Outra opção para ng-option que agrupa o select por categoria
+	-->
+	
+	<select class="form-control" ng-model="contato.operadora" ng-options="operadora.nome for operadora in operadoras">
+		<option value="">Selecione uma operadora</option>
+	</select>
+
+	</form>
+	<div ng-show="contatoForm.nome.$error.required &&  contatoForm.nome.$dirty" class="alert alert-danger">
+		Por favor, preencha o campo nome.
+	</div>
+	<div ng-show="contatoForm.nome.$error.minlength &&  contatoForm.nome.$dirty" class="alert alert-danger">
+		O campo nome deve ter no mínimo 10 caractéres.
+	</div>
+	<div ng-show="contatoForm.telefone.$invalid &&  contatoForm.telefone.$dirty" class="alert alert-danger">
+		Por favor, preencha o campo telefone.
+	</div>
+	<button class="btn btn-primary btn-block"ng-click="adicionarContato(contato)" ng-disabled="contatoForm.$invalid">Adicionar Contato</button>
+	<!--<button class="btn btn-danger btn-block"ng-click="apagarContatos(contatos)" ng-disabled="!isContatoSelecionado(contatos)">Apagar Contato</button>-->
+	<button class="btn btn-danger btn-block"ng-click="apagarContatos(contatos)" ng-show="isContatoSelecionado(contatos)">Apagar Contato</button>
+	<!--<button class="btn btn-danger btn-block"ng-click="apagarContatos(contatos)" ng-hide="!isContatoSelecionado(contatos)">Apagar Contato</button>-->
+	<!--<button class="btn btn-danger btn-block"ng-click="apagarContatos(contatos)" ng-if="isContatoSelecionado(contatos)">Apagar Contato</button>-->
+</div>
+<div ng-include="'footer.html'">
+	
+</div>
+
+</body>
+</html>
