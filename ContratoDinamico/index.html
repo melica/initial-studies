@@ -10,14 +10,22 @@
 </head>
 <body ng-controller="contratoDinamicoController">
 <div>
+	<form name="locatarioForm">
+		<input class="form-control" type="text" placeholder="Nome" ng-model="locatario.nome"/>
+		<input class="form-control" type="text" placeholder="RG" ng-model="locatario.rg"/>
+		<input class="form-control" type="text" placeholder="CPF" ng-model="locatario.cpf"/>
+	</form>
+	{{locatarios}}
+</div>
+<div>
 	<p>
 		Pelo presente instrumento particular, nesta e na melhor forma de Direito, os abaixo assinados de um lado,
 	</p>
 </div>
 
-<div>
+<div ng-show="contato in contatos">
 	<p>
-		<strong>xxxxxxx</strong>, brasileiro, separado judicialmente, do comercio, residente e domiciliado nesta Capital - SP, portador da cédula de identidade RG nº 5.39 SSP/PR, inscrito no CPF/MF n.º 179.168.458-06, de ora em diante chamado simplesmente de <strong>LOCADOR</strong> e de outro lado,
+		<strong>{{locatario.nome}}</strong>, brasileiro, separado judicialmente, do comercio, residente e domiciliado nesta Capital - SP, portador da cédula de identidade RG nº {{locatario.rg}} SSP/PR, inscrito no CPF/MF n.º {{locatario.cpf}}, de ora em diante chamado simplesmente de <strong>LOCADOR</strong> e de outro lado,
 	</p>
 </div>
 
